@@ -1,0 +1,60 @@
+
+zookeeper
+
+d:\kafka\bin\windows>zookeeper-server-start.bat ..\..\config\zookeeper.properties
+
+
+kafka server
+
+D:\kafka\bin\windows>kafka-server-start.bat ..\..\config\server.properties
+
+
+create topic
+
+D:\kafka\bin\windows>kafka-topics.bat --create --topic first-topic --zookeeper localhost:2181 --partitions 1 --replication-factor 1
+Created topic first-topic.
+
+topic partition
+D:\kafka\bin\windows>kafka-topics.bat --create --topic second-topic --zookeeper localhost:2181 --partitions 2 --replication-factor 1
+Created topic second-topic.
+
+D:\kafka\bin\windows>kafka-topics.bat --create --topic third-topic --zookeeper localhost:2181 --partitions 3 --replication-factor 1
+Created topic third-topic.
+
+kafka-topics.bat --create --topic fourth-topic --zookeeper localhost:2181 --partitions 3 --replication-factor 1
+Created topic fourth-topic.
+
+kafka-topics.bat --create --topic fifth-topic --zookeeper localhost:2181 --partitions 4 --replication-factor 1
+Created topic fifth-topic.
+
+kafka-topics.bat --create --topic sixth-topic --zookeeper localhost:2181 --partitions 4 --replication-factor 1
+
+
+kafka consumer
+
+D:\kafka\bin\windows>kafka-console-consumer.bat
+ --topic first-topic --bootstrap-server localhost:9092
+
+D:\kafka\bin\windows>kafka-console-consumer.bat --topic first-topic --bootstrap-server localhost:9092 --consumer-property group.id=test-group
+
+kafka producer
+
+D:\kafka\bin\windows>kafka-console-producer.bat --topic first-topic --broker-list localhost:9092
+
+
+again get msgs from beginning or if you started producer first before consumer
+
+D:\kafka\bin\windows>kafka-console-consumer.bat --topic first-topic --bootstrap-server localhost:9092 --from-beginning
+
+
+Kakfka file connector run & test
+
+run
+D:\kafka\bin\windows>connect-standalone.bat ..\..\config\connect-standalone.properties ..\..\config\connect-file-source.properties
+
+test
+
+D:\kafka\bin\windows>kafka-console-consumer.bat --topic sixth-topic --bootstrap-server localhost:9092 --from-beginning
+{"schema":{"type":"string","optional":false},"payload":"hello"}
+{"schema":{"type":"string","optional":false},"payload":"this is test file."}
+
