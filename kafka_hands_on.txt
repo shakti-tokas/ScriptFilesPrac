@@ -58,3 +58,43 @@ D:\kafka\bin\windows>kafka-console-consumer.bat --topic sixth-topic --bootstrap-
 {"schema":{"type":"string","optional":false},"payload":"hello"}
 {"schema":{"type":"string","optional":false},"payload":"this is test file."}
 
+
+run with sink
+D:\kafka\bin\windows>connect-standalone.bat ..\..\config\connect-standalone.properties ..\..\config\connect-file-source.properties ..\..\config\connect-file-sink.properties
+
+
+Linux box pd
+
+u: kafka
+p: redhat
+
+oracle db pd
+p: redhat
+
+
+start confluent as
+
+sudo ./confluent start
+
+SQL> connect sys/redhat as sysdba
+Connected.
+
+SQL> create user kafka identified by redhat;
+
+User created.
+
+SQL> grant connect, resource, dba to kafka;
+
+Grant succeeded.
+
+SQL> connect kafka/redhat;
+Connected.
+
+SQL> create table employee(
+    emp_id integer,
+    emp_name varchar2(20),
+    designation varchar2(20),
+    primary key(emp_id));
+
+Table created.
+
