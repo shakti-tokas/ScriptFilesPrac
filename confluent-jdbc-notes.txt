@@ -1,0 +1,59 @@
+creating oracle user and table.
+
+connect sys/admin as sysdba;
+create user testuser identified by testpass;
+grant connect,resource,dba to testuser;
+connect testuser/pass;
+create table employee(emp_id integer,emp_name varchar(20),designation varchar(20),
+primary key(emp_id));
+
+CREATE SEQUENCE emp_seq START WITH 1 INCREMENT BY 1;
+ 
+CREATE OR REPLACE TRIGGER emp_seq_tr
+ BEFORE INSERT or update ON employee FOR EACH ROW
+BEGIN
+  SELECT emp_seq.NEXTVAL INTO :NEW.emp_id FROM DUAL;
+ 
+END;
+/
+
+
+
+within vm.
+
+cd  ~/Desktop/Kafka/confluent-5.1
+sudo bin/confluent stop
+sudo bin/confluent start schema-registry
+
+download oracle jdbc driver and copy it to confluent-5.1/share/java/kafka-connect-jdbc 
+directory.
+create source-oracle.properties in confluent-5.1/etc/kafka-connect-jdbc directory
+and the content of the file is 
+name=test-oracle-jdbc-autoincrement
+connector.class=io.confluent.connect.jdbc.JdbcSourceConnector
+
+tasks.max=1
+
+connection.password = testpass
+
+connection.url = jdbc:oracle:thin:@192.168.18.81:1521:xe
+
+connection.user = testuser
+
+table.whitelist=EMPLOYEE
+
+mode=incrementing
+
+incrementing.column.name=EMP_ID
+
+
+topic.prefix=test-jdbc-
+
+start the connector
+sudo bin/connect-standalone etc/sechema-registry/connect-standalone.properties etc/kafka-connect-jdbc/source-oracle.properties
+
+open another terminal window and check the topic 
+
+sudo bin/kafka-avro-console-consumer --topic test-jdbc-EMPLOYEE --bootstrap-server localhost:9092
+
+

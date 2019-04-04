@@ -29,6 +29,24 @@ Created topic fifth-topic.
 
 kafka-topics.bat --create --topic sixth-topic --zookeeper localhost:2181 --partitions 4 --replication-factor 1
 
+kafka-topics.bat --create --topic test-cluster --zookeeper localhost:2181 --partitions 4 --replication-factor 2
+
+-- to describe topic & its info
+
+kafka-topics.bat --describe --topic test-cluster --zookeeper localhost:2181
+
+D:\kafka\bin\windows>kafka-topics.bat --create --topic first-topic --zookeeper localhost:2181 --partitions 4 --replication-factor 2
+Error while executing topic command : Topic 'first-topic' already exists.
+[2019-04-04 14:32:30,758] ERROR org.apache.kafka.common.errors.TopicExistsException: Topic 'first-topic' already exists.
+ (kafka.admin.TopicCommand$)
+
+# we can only alter to increase number of partitions
+# We can't decrease partitions, and neither change replication factor
+
+kafka-topics.bat --alter --topic test-cluster --zookeeper localhost:2181 --partitions 5 --replication-factor 2
+
+kafka-topics.bat --create --topic demo-cluster --zookeeper localhost:2181 --partitions 5 --replication-factor 3
+
 
 kafka consumer
 
@@ -76,6 +94,10 @@ start confluent as
 
 sudo ./confluent start
 
+sudo ./confluent status
+
+sudo ./confluent stop
+
 SQL> connect sys/redhat as sysdba
 Connected.
 
@@ -97,4 +119,80 @@ SQL> create table employee(
     primary key(emp_id));
 
 Table created.
+
+SQL> describe employee;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ EMP_ID                                    NOT NULL NUMBER(38)
+ EMP_NAME                                           VARCHAR2(20)
+ DESIGNATION                                        VARCHAR2(20)
+ 
+
+SQL> select * from global_name;
+ 
+SQL> select * from sys.all_users;
+
+
+CREATE SEQUENCE emp_seq START WITH 1 INCREMENT BY 1;
+ 
+CREATE OR REPLACE TRIGGER emp_seq_tr
+ BEFORE INSERT or update ON employee FOR EACH ROW
+BEGIN
+  SELECT emp_seq.NEXTVAL INTO :NEW.emp_id FROM DUAL;
+ 
+END;
+/
+
+SQL> insert into employee (emp_name, designation) values ('Arvind Reddy', 'Developer');
+
+1 row created.
+
+SQL> insert into employee (emp_name, designation) values ('Ravi Verma', 'Accountant');
+
+1 row created.
+
+SQL> select * from employee;
+
+    EMP_ID EMP_NAME             DESIGNATION
+---------- -------------------- --------------------
+         1 Arvind Reddy         Developer
+         2 Ravi Verma           Accountant
+
+
+-- ----------------------------------------------------------
+
+commit;
+
+SQL> update employee
+  2  set designation='SE'
+  3  where emp_id = 5;
+
+1 row updated.
+
+SQL> commit;
+
+Commit complete.
+
+SQL> select * from employee;
+
+    EMP_ID EMP_NAME             DESIGNATION
+---------- -------------------- --------------------
+         1 Arvind Reddy         Developer
+         2 Ravi Verma           Accountant
+         3 Booby Ganesan        Accountant
+         4 Baba Ramdev          Baba
+         7 Amit Shah            SE
+         6 Vijay Sharma         Architect
+
+6 rows selected.
+
+-- --------------------
+
+for sink connector --
+
+
+
+
+
+
 

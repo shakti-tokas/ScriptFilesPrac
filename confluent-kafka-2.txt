@@ -1,0 +1,94 @@
+creating oracle user and table.
+
+connect sys/admin as sysdba;
+create user testuser identified by testpass;
+grant connect,resource,dba to testuser;
+connect testuser/pass;
+create table employee(emp_id integer,emp_name varchar(20),designation varchar(20),
+primary key(emp_id));
+
+CREATE SEQUENCE emp_seq START WITH 1 INCREMENT BY 1;
+ 
+CREATE OR REPLACE TRIGGER emp_seq_tr
+ BEFORE INSERT or update ON employee FOR EACH ROW
+BEGIN
+  SELECT emp_seq.NEXTVAL INTO :NEW.emp_id FROM DUAL;
+ 
+END;
+/
+
+
+
+within vm.
+
+cd  ~/Desktop/Kafka/confluent-5.1
+sudo bin/confluent stop
+sudo bin/confluent start schema-registry
+
+download oracle jdbc driver and copy it to confluent-5.1/share/java/kafka-connect-jdbc 
+directory.
+create source-oracle.properties in confluent-5.1/etc/kafka-connect-jdbc directory
+and the content of the file is 
+name=test-oracle-jdbc-autoincrement
+connector.class=io.confluent.connect.jdbc.JdbcSourceConnector
+
+tasks.max=1
+
+connection.password = testpass
+
+connection.url = jdbc:oracle:thin:@192.168.18.81:1521:xe
+
+connection.user = testuser
+
+table.whitelist=EMPLOYEE
+
+mode=incrementing
+
+incrementing.column.name=EMP_ID
+
+
+topic.prefix=test-jdbc-
+
+start the connector
+sudo bin/connect-standalone etc/sechema-registry/connect-standalone.properties etc/kafka-connect-jdbc/source-oracle.properties
+
+open another terminal window and check the topic 
+
+sudo bin/kafka-avro-console-consumer --topic test-jdbc-EMPLOYEE --bootstrap-server localhost:9092
+
+
+
+to use cassandra as sink
+
+open a terminal window and go to cassandra/bin directory
+./cassandra
+
+open another terminal window and go to cassandra/bin directory
+./cqlsh
+
+create keyspace TestKeySpace with replication={'class':'SimpleStrategy',
+'replication_factor'=1}
+
+use TestKeySpace;
+create table employee (emp_id int,emp_name text,designation text, parimary key(emp_id))
+
+download cassandra connector from https://github.com/Landoop/stream-reactor/releases/download/1.2.1/kafka-connect-cassandra-1.2.1-2.1.0-all.tar.gz,
+extract it and copy it to share/java/kafka-connect-jdbc directory
+
+create sink-cassandra.properties under confluent5.1/etc/kafka-connect-jdbc directory
+and paste the following content
+name=cassandra-sink-employees
+connector.class=com.datamountaineer.streamreactor.connect.cassandra.sink.CassandraSinkConnector
+tasks.max=1
+topics=test-jdbc-EMPLOYEE
+connect.cassandra.kcql=INSERT INTO employee SELECT * FROM test-jdbc-EMPLOYEE
+connect.cassandra.contact.points=localhost
+connect.cassandra.port=9042
+connect.cassandra.key.space=TestKeySpace
+connect.cassandra.username=cassandra
+connect.cassandra.password=cassandra
+
+
+stop if any exisiting connector is running, and restart the connector with the following command
+
+sudo bin/connect-standalone etc/sechema-registry/connect-standalone.properties etc/kafka-connect-jdbc/source-oracle.properties etc/kafka-connect-jdbc/sink-cassandra.properties
