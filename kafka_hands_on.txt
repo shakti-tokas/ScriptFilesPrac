@@ -197,6 +197,10 @@ SQL> select * from employee;
 for sink connector --
 
 
+kafka python --
+
+https://pypi.org/project/kafka-python/
+
 
 
 
