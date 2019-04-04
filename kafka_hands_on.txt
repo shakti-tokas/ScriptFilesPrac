@@ -8,6 +8,12 @@ kafka server
 
 D:\kafka\bin\windows>kafka-server-start.bat ..\..\config\server.properties
 
+D:\kafka\bin\windows>set KAFKA_OPTS=-Djava.security.auth.login.config=D:\kafka\config\jaas-config.properties
+then run server using secure-server prop file
+
+
+in java run pass this argument
+-Djava.security.auth.login.config=client-jaas.properties
 
 create topic
 
