@@ -1,0 +1,71 @@
+Welcome
+
+create source oracle file in /home/kafka/Desktop/Kafka/confluent-5.1.0/etc/kafka-connect-jdbc/source-oracle.properties
+
+sudo ./confluent start schema-registry
+
+[kafka@localhost bin]$ sudo ./confluent start schema-registry 
+This CLI is intended for development only, not for production
+https://docs.confluent.io/current/cli/index.html
+
+Using CONFLUENT_CURRENT: /tmp/confluent.GYAMIfWi
+Starting zookeeper
+zookeeper is [UP]
+Starting kafka
+kafka is [UP]
+Starting schema-registry
+schema-registry is [UP]
+
+
+sudo bin/connect-standalone etc/schema-registry/connect-avro-standalone.properties etc/kafka-connect-jdbc/source-oracle.properties
+
+
+bin/kafka-avro-console-consumer --bootstrap-server localhost:9092 --topic test-jdbs-EMPLOYEE --from-beginning
+
+
+[kafka@localhost confluent-5.1.0]$ bin/kafka-avro-console-consumer --bootstrap-server localhost:9092 --topic test-jdbc-EMPLOYEE --from-beginning
+OpenJDK 64-Bit Server VM warning: If the number of processors is expected to increase from one, then you should configure the number of parallel GC threads appropriately using -XX:ParallelGCThreads=N
+{"EMP_ID":"\u0001","EMP_NAME":{"string":"Arvind Reddy"},"DESIGNATION":{"string":"Developer"}}
+{"EMP_ID":"\u0002","EMP_NAME":{"string":"Ravi Verma"},"DESIGNATION":{"string":"Accountant"}}
+{"EMP_ID":"\u0003","EMP_NAME":{"string":"Booby Ganesan"},"DESIGNATION":{"string":"Accountant"}}
+{"EMP_ID":"\u0004","EMP_NAME":{"string":"Baba Ramdev"},"DESIGNATION":{"string":"Baba"}}
+{"EMP_ID":"\u0005","EMP_NAME":{"string":"Amit Shah"},"DESIGNATION":{"string":"SSE"}}
+
+
+
+cassandra --
+run cassandra as after extracting go to bin
+
+./cassandra
+
+cqlsh> describe keyspaces;
+
+system_traces  system_schema  system_auth  system  system_distributed
+
+
+cqlsh> describe keyspaces;
+
+system_traces  system_schema  system_auth  system  system_distributed
+
+cqlsh> CREATE KEYSPACE kafka_keyspace
+   ... WITH REPLICATION={'class':'SimpleStrategy','replication_factor':1};
+cqlsh> describe keyspaces;
+
+system_schema  system          system_distributed
+system_auth    kafka_keyspace  system_traces     
+
+cqlsh> use kafka_keyspace ;
+cqlsh:kafka_keyspace> CREATE TABLE employee(
+                  ... emp_id int,
+                  ... emp_name text,
+                  ... designation text,
+                  ... primary key(emp_id));
+
+
+
+https://github.com/Landoop/stream-reactor/releases
+
+kafka@localhost confluent-5.1.0]$ sudo bin/connect-standalone etc/schema-registry/connect-avro-standalone.properties etc/kafka-connect-jdbc/source-oracle.properties etc/kafka-connect-jdbc/sink-cassandra.properties
+
+
+
